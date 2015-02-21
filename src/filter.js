@@ -36,10 +36,31 @@ module.exports = function(brushedCb) {
 		filter.svg.x.domain(d3.extent(data, function(d) { return d.date; }));
 		filter.svg.y.domain([0, d3.max(data, function(d) { return d.volume; })]);
 
-		filter.context = filter.svg.node.append("path")
-			.datum(data)
-			.attr("class", "area volume")
-			.attr("d", filter.svg.area);
+      console.log(data);
+      window.test = data;
+
+      var datalist = [];
+      var current_list = [];
+      var prev = data[0].volume;
+
+      $(data).each(function(index, item){
+          if(item.volume * prev > 0){
+              current_list.push(item);
+          }
+          else
+          {
+              datalist.push(current_list);
+              current_list = [item];
+          }
+          prev = item.volume;
+      })
+    datalist.push(current_list);
+          console.log(datalist);
+
+		// filter.context = filter.svg.node.append("path")
+		// 	.datum(data)
+		// 	.attr("class", "area volume")
+		// 	.attr("d", filter.svg.area);
 		
 		filter.svg.node.append("g")
 			.attr("class", "x axis")

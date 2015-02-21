@@ -25,13 +25,47 @@ module.exports = function() {
 
 	var volume = {};
 
-	volume.draw = function(data, svgContainer, width, height) {
+    volume.draw = function(data, svgContainer, width, height){
+        
+      var datalist = [];
+      var current_list = [];
+      var prev = data[0].volume;
+
+      $(data).each(function(index, item){
+          if(item.volume * prev > 0){
+              current_list.push(item);
+          }
+          else
+          {
+              datalist.push(current_list);
+              current_list = [item];
+          }
+          prev = item.volume;
+      })
+    datalist.push(current_list);
+          console.log("NOVO!!!");
+          console.log(datalist);
+
+        var x0 = 0;
+        var x1 = 0;
+      $(datalist).each(function(index, item){
+          console.log("dddddddddddd");
+          var color = item[0].volume > 0 ? "blue" : "red";
+          color = "area volume " + color;
+          x1 = x0 + width * item.lenght/data.length;
+	        volume.draw1(item, svgContainer, x0, x1, height, color);
+          x0 = x1;
+      }
+      )
+          };
+
+	  volume.draw1 = function(data, svgContainer, x0, x1, height, color) {
 
 		volume.container = svgContainer;
 
 		volume.data = data;
 
-		var x = d3.time.scale().range([0, width]);
+		var x = d3.time.scale().range([x0, x1]);
 		var y = d3.scale.linear().range([height, 220]);
 		var area = d3.svg.area()
 			.x(function(d) { return volume.svg.x(d.date); })
@@ -44,9 +78,9 @@ module.exports = function() {
 			area: area,
 			axis: {
 				x: d3.svg.axis().scale(x).tickFormat(timeFormat).orient("bottom"),
-				y: d3.svg.axis().scale(y).tickSize(width).tickFormat(yAxisFormat).orient("right")
+				y: d3.svg.axis().scale(y).tickSize(x1-x0).tickFormat(yAxisFormat).orient("right")
 			},
-			node: svgContainer.append("path").attr("class", "area volume")
+			node: svgContainer.append("path").attr("class", color)
 		};
 
 		volume.svg.x.domain(d3.extent(data, function(d) { return d.date; }));

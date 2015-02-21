@@ -54,6 +54,7 @@ module.exports = function() {
 };
 
 function scrap(data) {
+    return;
 
 	var toDownload = [];
 	var newData = [];
